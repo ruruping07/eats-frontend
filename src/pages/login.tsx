@@ -16,7 +16,7 @@ interface ILoginForm {
   resultError?: string;
 }
 
-const LOGIN_MUTATION = gql`
+export const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
     login(input: $loginInput) {
       ok
@@ -70,9 +70,9 @@ export const Login = () => {
                 required: "Email is required",
                 pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
               })}
-              name="email" required type="email" placeholder="Email" className="input" />
-            { errors.email?.message && (<FormError errorMessage={errors.email?.message} />) }
+              name="email" required type="email" placeholder="Email" className="input" />            
             {errors.email?.type === "pattern" && ( <FormError errorMessage={"Please enter a valid email"} /> )}
+            {errors.email?.message && (<FormError errorMessage={errors.email?.message} />)}
             <input ref={register({ required: "Password is required" })} required name="password" type="password" placeholder="Password" className="input" />
             {errors.password?.message && (<FormError errorMessage={errors.password?.message} />)}
             {errors.password?.type === "minLength" && ( <FormError errorMessage="Password must be more than 10 chars." /> )}

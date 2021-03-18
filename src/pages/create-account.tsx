@@ -9,7 +9,7 @@ import nuberLogo from "../images/logo.svg";
 import { createAccountMutation, createAccountMutationVariables, } from "../__generated__/createAccountMutation";
 import { UserRole } from "../__generated__/globalTypes";
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
     createAccount(input: $createAccountInput) {
       ok
@@ -75,7 +75,6 @@ export const CreateAccount = () => {
           {errors.email?.type === "pattern" && (<FormError errorMessage={"Please enter a valid email"} />)}
           <input ref={register({ required: "Password is required" })} required name="password" type="password" placeholder="Password" className="input" />
           {errors.password?.message && (<FormError errorMessage={errors.password?.message} />)}
-          {errors.password?.type === "minLength" && (<FormError errorMessage="Password must be more than 10 chars." />)}
           <select name="role" ref={register({ required: true })} className="input" >
             {Object.keys(UserRole).map((role, index) => ( <option key={index}>{role}</option> ))}
           </select>
