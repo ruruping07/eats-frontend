@@ -56,21 +56,6 @@ export const MyRestaurant = () => {
     }
   );
 
-  const chartData = [
-    { x: 1, y: 3000 },
-    { x: 2, y: 1500 },
-    { x: 3, y: 4250 },
-    { x: 4, y: 1250 },
-    { x: 5, y: 2300 },
-    { x: 6, y: 7150 },
-    { x: 7, y: 6830 },
-    { x: 8, y: 6830 },
-    { x: 9, y: 6830 },
-    { x: 10, y: 6830 },
-    { x: 11, y: 6830 },
-  ];
-
-  console.log(data);
 
   return (
     <div>
@@ -87,7 +72,8 @@ export const MyRestaurant = () => {
           (
             <div className="grid mt-16 md:grid-cols-3 gap-x-5 gap-y-10">
               {data?.myRestaurant.restaurant?.menu.map((dish) => (
-                <Dish name={dish.name} description={dish.description} price={dish.price} />
+                <div>Dish</div>
+                //<Dish name={dish.name} description={dish.description} price={dish.price} />
               ))}
             </div>
           )}
