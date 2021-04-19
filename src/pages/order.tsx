@@ -1,11 +1,13 @@
-import { gql, useQuery, useSubscription } from "@apollo/client";
-import { param } from "cypress/types/jquery";
+import { gql, useQuery, useSubscription, useMutation } from "@apollo/client";
 import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
 import { FULL_ORDER_FRAGMENT } from "../fragments";
+import { useMe } from "../hooks/useMe";
 import { getOrder, getOrderVariables } from "../__generated__/getOrder";
 import { orderUpdates, orderUpdatesVariables, } from "../__generated__/orderUpdates";
+import { editOrder, editOrderVariables } from "../__generated__/editOrder";
+import { OrderStatus, UserRole } from "../__generated__/globalTypes";
 
 const GET_ORDER = gql`
   query getOrder($input: GetOrderInput!) {
@@ -29,12 +31,25 @@ const ORDER_SUBSCRIPTION = gql`
   ${FULL_ORDER_FRAGMENT}
 `;
 
+const EDIT_ORDER = gql`
+  mutation editOrder($input: EditOrderInput!) {
+    editOrder(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
 interface IParams {
   id: string;
 }
 
 export const Order = () => {
   const params = useParams<IParams>();
+  const { data: userData } = useMe();
+  const [editOrderMutation] = useMutation<editOrder, editOrderVariables>(
+    EDIT_ORDER
+  );
   const { data, subscribeToMore } = useQuery<getOrder, getOrderVariables>(
     GET_ORDER, {
       variables: {
@@ -72,6 +87,17 @@ export const Order = () => {
     }
   }, [data]);
 
+  const onButtonClick = (newStatus: OrderStatus) => {
+    editOrderMutation({
+      variables: {
+        input: {
+          id: +params.id,
+          status: newStatus,
+        },
+      },
+    });
+  };
+
   console.log(data);
   
   return (
@@ -105,9 +131,38 @@ export const Order = () => {
               {data?.getOrder.order?.driver?.email || "Not yet."}
             </span>
           </div>
-          <span className=" text-center mt-5 mb-3  text-2xl text-lime-600">
-            Status: {data?.getOrder.order?.status}
-          </span>
+          {userData?.me.role === "Client" && (
+            <span className=" text-center mt-5 mb-3  text-2xl text-lime-600">
+              Status: {data?.getOrder.order?.status}
+            </span>
+          )}
+          {userData?.me.role === UserRole.Owner && (
+            <>
+              {data?.getOrder.order?.status === "Pending" && ( 
+                <button onClick={() => onButtonClick(OrderStatus.Cooking)} className="btn">Accept Order</button>
+              )}
+              {data?.getOrder.order?.status === "Cooking" && ( 
+                <button onClick={() => onButtonClick(OrderStatus.Cooking)} className="btn">Order Cooked</button>
+              )}
+              {data?.getOrder.order?.status !== OrderStatus.Cooking &&
+                data?.getOrder.order?.status !== OrderStatus.Pending && (
+                  <span className=" text-center mt-5 mb-3  text-2xl text-lime-600">Status: {data?.getOrder.order?.status}</span>
+              )}
+            </>
+          )}
+          {userData?.me.role === UserRole.Delivery && (
+            <>
+              {data?.getOrder.order?.status === OrderStatus.Cooked && (
+                <button onClick={() => onButtonClick(OrderStatus.PickedUp)} className="btn" >Picked Up</button>
+              )}
+              {data?.getOrder.order?.status === OrderStatus.PickedUp && (
+                <button onClick={() => onButtonClick(OrderStatus.Delivered)} className="btn">Order Delivered</button>
+              )}
+            </>
+          )}
+          {data?.getOrder.order?.status === OrderStatus.Delivered && (
+            <span className=" text-center mt-5 mb-3  text-2xl text-lime-600">Thank you for using Nuber Eats</span>
+          )}
         </div>
       </div>
     </div>

@@ -15,6 +15,12 @@ import { AddRestaurant } from "../pages/owner/add-restaurants";
 import { MyRestaurant } from "../pages/owner/my-restaurant";
 import { AddDish } from "../pages/owner/add-dish";
 import { Order } from "../pages/order";
+import { Dashboard } from "../pages/driver/dashboard";
+import { UserRole } from "../__generated__/globalTypes";
+
+const driverRoutes = [
+  { path: "/", component: <Dashboard /> }
+];
 
 const clientRoutes = [
   { path: "/", component: <Restaurants />, },
@@ -53,15 +59,18 @@ export const LoggedInRouter = () => {
     <Router>
       <Header />
       <Switch>
-        {data.me.role === "Client" && clientRoutes.map((route) => (
+        {data.me.role === UserRole.Client && clientRoutes.map((route) => (
           <Route exact key={route.path} path={route.path}> {route.component} </Route>
         ))}
-        {data.me.role === "Owner" && restaurantRoutes.map((route) => (
+        {data.me.role === UserRole.Owner && restaurantRoutes.map((route) => (
           <Route exact key={route.path} path={route.path}> {route.component} </Route>
+        ))}
+        {data.me.role === UserRole.Delivery && driverRoutes.map((route) => (
+          <Route exact key={route.path} path={route.path}>{route.component}</Route>
         ))}
         {commonRoutes.map((route) => (
           <Route key={route.path} path={route.path}> {route.component} </Route>
-        ))}
+        ))}        
         <Route>
           <NotFound />
         </Route>
